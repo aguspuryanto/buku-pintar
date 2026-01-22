@@ -19,6 +19,7 @@ import FinanceView from './components/FinanceView';
 
 const App: React.FC = () => {
   const [activeModule, setActiveModule] = useState<Module>('Dashboard');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS);
   const [transactions, setTransactions] = useState<Transaction[]>(INITIAL_TRANSACTIONS);
   const [employees, setEmployees] = useState<Employee[]>(INITIAL_EMPLOYEES);
@@ -69,12 +70,12 @@ const App: React.FC = () => {
         );
       case 'AI':
         return (
-          <div className="max-w-4xl mx-auto py-12 text-center space-y-6">
-            <div className="w-24 h-24 bg-indigo-100 rounded-3xl flex items-center justify-center text-indigo-600 mx-auto mb-8">
-              <i className="fas fa-robot text-4xl"></i>
+          <div className="max-w-4xl mx-auto py-12 px-4 text-center space-y-6">
+            <div className="w-20 h-20 md:w-24 md:h-24 bg-indigo-100 rounded-3xl flex items-center justify-center text-indigo-600 mx-auto mb-8">
+              <i className="fas fa-robot text-3xl md:text-4xl"></i>
             </div>
-            <h2 className="text-3xl font-bold">Asisten AI Chat</h2>
-            <p className="text-slate-500 max-w-lg mx-auto leading-relaxed">
+            <h2 className="text-2xl md:text-3xl font-bold">Asisten AI Chat</h2>
+            <p className="text-slate-500 max-w-lg mx-auto leading-relaxed text-sm md:text-base">
               Gunakan asisten AI di pojok kanan bawah untuk bertanya tentang data bisnis Anda menggunakan bahasa sehari-hari. 
               Misalnya: "Berapa total stok kopi arabika di semua gudang?" atau "Berapa penjualan bulan lalu?"
             </p>
@@ -82,10 +83,10 @@ const App: React.FC = () => {
         );
       default:
         return (
-          <div className="flex flex-col items-center justify-center h-[60vh] text-slate-400">
-            <i className="fas fa-tools text-6xl mb-4"></i>
-            <p className="text-xl font-medium">Modul "{activeModule}" Sedang Dalam Pengembangan</p>
-            <p className="text-sm">Silakan cek modul Dashboard, Inventori, Penjualan, atau SDM yang sudah aktif.</p>
+          <div className="flex flex-col items-center justify-center h-[60vh] text-slate-400 px-6 text-center">
+            <i className="fas fa-tools text-5xl md:text-6xl mb-4"></i>
+            <p className="text-lg md:text-xl font-medium">Modul "{activeModule}" Sedang Dalam Pengembangan</p>
+            <p className="text-xs md:text-sm mt-2">Silakan cek modul Dashboard, Inventori, Penjualan, atau SDM yang sudah aktif.</p>
           </div>
         );
     }
@@ -93,10 +94,34 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 pb-20">
-      <Sidebar activeModule={activeModule} setActiveModule={setActiveModule} />
+      <Sidebar 
+        activeModule={activeModule} 
+        setActiveModule={setActiveModule} 
+        isOpen={isSidebarOpen}
+        setIsOpen={setIsSidebarOpen}
+      />
       
-      <main className="ml-64 p-8">
-        <header className="flex justify-between items-center mb-10">
+      {/* Mobile Top Header */}
+      <header className="lg:hidden flex items-center justify-between p-4 bg-white border-b border-slate-200 sticky top-0 z-50">
+        <button 
+          onClick={() => setIsSidebarOpen(true)}
+          className="w-10 h-10 flex items-center justify-center text-slate-600 bg-slate-100 rounded-lg"
+        >
+          <i className="fas fa-bars"></i>
+        </button>
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white text-sm">
+            <i className="fas fa-book-bookmark"></i>
+          </div>
+          <span className="font-bold text-slate-800">BukuPintar</span>
+        </div>
+        <div className="w-10 h-10 rounded-lg bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold text-xs">
+          JD
+        </div>
+      </header>
+
+      <main className="lg:ml-64 p-4 md:p-8">
+        <header className="hidden lg:flex justify-between items-center mb-10">
           <div>
             <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">{activeModule}</h1>
             <p className="text-slate-500 text-sm mt-1">Selamat datang kembali, Mari kelola bisnis Anda dengan efisien.</p>
@@ -111,6 +136,12 @@ const App: React.FC = () => {
             </button>
           </div>
         </header>
+
+        {/* Desktop title for mobile */}
+        <div className="lg:hidden mb-6">
+           <h1 className="text-2xl font-bold text-slate-900">{activeModule}</h1>
+           <p className="text-xs text-slate-500 mt-1">{new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+        </div>
 
         {renderContent()}
       </main>
