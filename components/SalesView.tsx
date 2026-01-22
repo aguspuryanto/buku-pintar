@@ -35,6 +35,36 @@ const SalesView: React.FC<SalesViewProps> = ({ transactions, paymentConfig, onUp
     setIsGenerating(false);
   };
 
+  const exportToCSV = () => {
+    const headers = ['ID Faktur', 'Pelanggan', 'Email', 'Tanggal', 'Total (Rp)', 'Status', 'Gateway'];
+    const rows = salesInvoices.map(invoice => [
+      invoice.id,
+      invoice.customerVendor,
+      invoice.customerEmail || '-',
+      invoice.date,
+      invoice.total,
+      invoice.status,
+      invoice.paymentGateway || 'Manual'
+    ]);
+
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => row.map(value => `"${value}"`).join(','))
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    const timestamp = new Date().toISOString().split('T')[0];
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', `Laporan_Penjualan_${timestamp}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const getStatusStyle = (status: string) => {
     switch (status) {
       case 'Lunas': return 'bg-emerald-100 text-emerald-700 border-emerald-200';
@@ -51,9 +81,17 @@ const SalesView: React.FC<SalesViewProps> = ({ transactions, paymentConfig, onUp
           <h2 className="text-2xl font-bold">Daftar Penjualan</h2>
           <p className="text-slate-500 text-sm">Kelola faktur, lacak pembayaran, dan kirim tagihan.</p>
         </div>
-        <button className="px-5 py-2.5 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-all flex items-center gap-2 shadow-lg shadow-indigo-100 font-semibold">
-          <i className="fas fa-plus"></i> Buat Faktur Baru
-        </button>
+        <div className="flex gap-3">
+          <button 
+            onClick={exportToCSV}
+            className="px-5 py-2.5 bg-white border border-slate-200 text-slate-700 rounded-xl hover:bg-slate-50 hover:border-indigo-200 hover:text-indigo-600 transition-all flex items-center gap-2 font-semibold shadow-sm"
+          >
+            <i className="fas fa-file-export"></i> Ekspor CSV
+          </button>
+          <button className="px-5 py-2.5 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-all flex items-center gap-2 shadow-lg shadow-indigo-100 font-semibold">
+            <i className="fas fa-plus"></i> Buat Faktur Baru
+          </button>
+        </div>
       </div>
 
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
